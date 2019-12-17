@@ -1,4 +1,4 @@
-module module
+module goApi
 
 go 1.13
 
