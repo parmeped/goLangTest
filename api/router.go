@@ -4,22 +4,23 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ginGonicApi/repository"
+	repo "github.com/ginGonicApi/repository"
 )
 
-func SetupRouter(db *repository.DB) *gin.Engine {
+func SetupRouter(db *repo.DB) *gin.Engine {
 	router := gin.Default()
 
 	v1 := router.Group("/v1")
 	{
 		v1.POST("/login", LoginHandler())
-		v1.GET("/read", ReadHandler(db))
+		v1.GET("/messages", ReadHandler(db))
 	}
 
-	authorized := router.Group("/auth", gin.BasicAuth(repository.GetAuthorised()))
+	authorized := router.Group("/auth", gin.BasicAuth(repo.GetAuthorized(db)))
 	{
-		authorized.POST("/addAuthorizedUser", endpointHandler())
-		authorized.POST("/readAuthorizedUsers", endpointHandler())
+		authorized.POST("/newAuthorizedUser", PostAuthUserHandler(db))
+		authorized.GET("/AuthorizedUsers", GetAuthUsersHandler(db))
+		authorized.POST("/sendMessage", SendMessageHandler(db))
 	}
 
 	return router

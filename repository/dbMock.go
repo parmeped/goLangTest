@@ -1,27 +1,22 @@
 package repository
 
-import "github.com/gin-gonic/gin"
-
-var authorised = gin.Accounts{
-	"TestUser": "pass",
+var authorised = []User{
+	User{"TestUser", "pass"},
 }
 
-var testArray = [3]string{
+var testArray = []string{
 	"test1",
 	"test2",
 	"test3",
 }
 
+// the mocked data returned
 type Repo struct {
-	Authorised map[string]string
-	TestArray  [3]string
+	Authorized []User
+	TestArray  []string
 }
 
 func GetRepo() *Repo {
 	repo := Repo{authorised, testArray}
 	return &repo
-}
-
-func GetAuthorised() gin.Accounts {
-	return authorised
 }
