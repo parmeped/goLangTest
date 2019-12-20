@@ -1,14 +1,20 @@
 package repository
 
-type DataReader interface {
-	Read() []string
+import "github.com/gin-gonic/gin"
+
+type IAddAuthorizedUser interface {
+	AddAuthorizedUser(u gin.Accounts) bool
+}
+
+type IReadAuthorizedUsers interface {
+	ReadAuthorizedUsers() gin.Accounts
 }
 
 type DB struct {
-	Tables [1]Table
+	Collections [1]Collection
 }
 
-type Table struct {
+type Collection struct {
 	Name string
 	Data [3]string
 }
@@ -18,21 +24,12 @@ func New() *DB {
 }
 
 func initializer() *DB {
-	array := [3]string{"test1", "test2", "test3"}
-	var table = Table{"testing", array}
-	var tables [1]Table
-	tables[0] = table
+	var repo = GetRepo()
 
-	var db = DB{tables}
+	var coll = Collection{"testing", repo.TestArray}
+	var collections [1]Collection
+	collections[0] = coll
+
+	var db = DB{collections}
 	return &db
-}
-
-func Read() []string {
-	var readTest []string
-	readTest[0] = "Are"
-	readTest[1] = "You"
-	readTest[2] = "Reading"
-	readTest[3] = "This"
-
-	return readTest
 }

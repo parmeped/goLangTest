@@ -10,20 +10,16 @@ import (
 func SetupRouter(db *repository.DB) *gin.Engine {
 	router := gin.Default()
 
-	// Simple group: v1
 	v1 := router.Group("/v1")
 	{
 		v1.POST("/login", LoginHandler())
-		v1.POST("/submit", SubmitHandler())
-		v1.POST("/read", ReadHandler(db))
+		v1.GET("/read", ReadHandler(db))
 	}
 
-	// Simple group: v2
-	v2 := router.Group("/v2")
+	authorized := router.Group("/auth", gin.BasicAuth(repository.GetAuthorised()))
 	{
-		v2.POST("/login", endpointHandler())
-		v2.POST("/submit", endpointHandler())
-		v2.POST("/read", endpointHandler())
+		authorized.POST("/addAuthorizedUser", endpointHandler())
+		authorized.POST("/readAuthorizedUsers", endpointHandler())
 	}
 
 	return router

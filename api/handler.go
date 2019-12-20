@@ -21,11 +21,7 @@ func SubmitHandler() gin.HandlerFunc {
 
 func ReadHandler(db *repository.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var data = [3]string
-		for i := 0; i < len(db.Tables[0].Data); i++ {
-			data[i] = db.Tables[0].Data[i]
-		}
-		c.JSON(http.StatusOK, data)
+		c.JSON(http.StatusOK, db.Collections[0].Data)
 	}
-	
+
 }
