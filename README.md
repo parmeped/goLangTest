@@ -9,3 +9,8 @@ Intent:
 - Send message to another user. 
 - Group routes. // Ok
 - Implement tests
+
+
+-----------------
+Improvements:
+- NewAuthorizedUser not being registered on the route for Auth
