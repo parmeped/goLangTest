@@ -10,10 +10,9 @@ import (
 func SetupRouter(db *repo.DB) *gin.Engine {
 	router := gin.Default()
 
-	v1 := router.Group("/v1")
+	v1 := router.Group("/")
 	{
 		v1.POST("/login", LoginHandler())
-		v1.GET("/messages", ReadHandler(db))
 	}
 
 	authorized := router.Group("/auth", gin.BasicAuth(repo.GetAuthorized(db)))
@@ -21,6 +20,8 @@ func SetupRouter(db *repo.DB) *gin.Engine {
 		authorized.POST("/newAuthorizedUser", PostAuthUserHandler(db))
 		authorized.GET("/AuthorizedUsers", GetAuthUsersHandler(db))
 		authorized.POST("/sendMessage", SendMessageHandler(db))
+		authorized.GET("/seenMessages", SeenMessagesHandler(db))
+		authorized.GET("/unseenMessages", UnseenMessagesHandler(db))
 	}
 
 	return router

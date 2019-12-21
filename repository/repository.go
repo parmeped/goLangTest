@@ -5,7 +5,9 @@ import "github.com/gin-gonic/gin"
 type IAuthorizedActions interface {
 	PostAuthUser(u User)
 	GetAuthUsers() gin.Accounts
-	SendMessage() bool
+	SendMessage(message Message)
+	GetUnseenMessages(u User) *[]Message
+	GetSeenMessages(u User) *[]Message
 }
 
 type DB struct {
@@ -14,8 +16,16 @@ type DB struct {
 }
 
 type User struct {
-	Name string
-	Pass string
+	Name           string
+	Pass           string
+	UnreadMessages []Message
+	Messages       []Message
+}
+
+type Message struct {
+	From    string
+	To      string
+	Message string
 }
 
 type Collection struct {
@@ -50,11 +60,29 @@ func initializer() *DB {
 }
 
 func GetAuthorized(d *DB) gin.Accounts {
-	// TODO we are assuming MapCollections[0] is authorized users!!
 	users := make(map[string]string)
-	for _, v := range d.MapCollections[0].Data {
+	for _, v := range GetMapCollection(d, "Authorized").Data {
 		users[v.Name] = v.Pass
 	}
 	var auths gin.Accounts = users
 	return auths
+}
+
+// TODO: these are the same! see how to improve, generics would be great
+func GetCollection(d *DB, collName string) *Collection {
+	for _, v := range d.Collections {
+		if v.Name == collName {
+			return &v
+		}
+	}
+	return nil
+}
+
+func GetMapCollection(d *DB, collName string) *MapCollection {
+	for _, v := range d.MapCollections {
+		if v.Name == collName {
+			return &v
+		}
+	}
+	return nil
 }

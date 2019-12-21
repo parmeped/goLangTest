@@ -25,7 +25,6 @@ func PostAuthUserHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
 		data.PostAuthUser(user)
 
 		c.Status(http.StatusNoContent)
-
 	}
 }
 
@@ -37,6 +36,18 @@ func GetAuthUsersHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
 }
 
 func SendMessageHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, "authHandlerPlaceHolder")
+	}
+}
+
+func SeenMessagesHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, "authHandlerPlaceHolder")
+	}
+}
+
+func UnseenMessagesHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.JSON(http.StatusOK, "authHandlerPlaceHolder")
 	}

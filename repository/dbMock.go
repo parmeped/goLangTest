@@ -1,7 +1,16 @@
 package repository
 
 var authorised = []User{
-	User{"TestUser", "pass"},
+	User{"TestUser",
+		"pass",
+		[]Message{Message{"unAuthUser", "TestUser", "Hi, this is an unread Auth Message"}},
+		[]Message{Message{"unAuthUser", "TestUser", "Hi, this was already auth read"}},
+	},
+	User{"unAuthUser",
+		"superPass",
+		[]Message{Message{"TestUser", "unAuthUser", "Hi, this is an unread Message"}},
+		[]Message{Message{"TestUser", "unAuthUser", "Hi, this was already read"}},
+	},
 }
 
 var testArray = []string{
