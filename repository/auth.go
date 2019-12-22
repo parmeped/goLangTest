@@ -4,6 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// --------------- Interface implementation ---------------
+
 func (d *DB) PostAuthUser(u User) {
 	d.UsersCollection = append(d.UsersCollection, u)
 }
@@ -14,17 +16,34 @@ func (d *DB) GetAuthUsers() gin.Accounts {
 	return auths
 }
 
-// TODO: implement sendMessage
-func (d *DB) SendMessage(message Message) {
-
+func (d *DB) SendMessage(to *User, message Message) bool {
+	for _, v := range d.UsersCollection {
+		if v.Name == to.Name {
+			v.UnseenMessages = append(v.UnseenMessages, message)
+			return true
+		}
+	}
+	return false
 }
 
-func (d *DB) GetSeenMessages(u User) *[]Message {
-	return &[]Message{}
+func (d *DB) GetSeenMessages(u *User) []Message {
+	messages := []Message{}
+	for _, v := range d.UsersCollection {
+		if v.Name == u.Name {
+			messages = v.Messages
+		}
+	}
+	return messages
 }
 
-func (d *DB) GetUnseenMessages(u User) *[]Message {
-	return &[]Message{}
+func (d *DB) GetUnseenMessages(u *User) []Message {
+	uMessages := []Message{}
+	for _, v := range d.UsersCollection {
+		if v.Name == u.Name {
+			uMessages = v.UnseenMessages
+		}
+	}
+	return uMessages
 }
 
 func (d *DB) ValidateAuthorizedUser(u User) bool {

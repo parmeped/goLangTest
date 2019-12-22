@@ -5,9 +5,9 @@ import "github.com/gin-gonic/gin"
 type IAuthorizedActions interface {
 	PostAuthUser(u User)
 	GetAuthUsers() gin.Accounts
-	SendMessage(message Message)
-	GetUnseenMessages(u User) *[]Message
-	GetSeenMessages(u User) *[]Message
+	SendMessage(to *User, message Message) bool
+	GetUnseenMessages(u *User) []Message
+	GetSeenMessages(u *User) []Message
 	ValidateAuthorizedUser(u User) bool
 	FindUserByName(n string) (*User, string)
 	MarkMessagesAsRead(u *User)
