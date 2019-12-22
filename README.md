@@ -4,7 +4,7 @@ Intent:
 - Mock db, with initialization test values. // Ok
 - Authorised users group. // Ok
 - Add authorized user. // Ok
-- Send message to another with auth. 
+- Send message to another with auth. // InProgress
 - Get unread messages // Ok. Marked as read when seen!
 - Group routes with Auth. // Ok
 - Login // Ok
