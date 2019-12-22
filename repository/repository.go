@@ -8,34 +8,30 @@ type IAuthorizedActions interface {
 	SendMessage(message Message)
 	GetUnseenMessages(u User) *[]Message
 	GetSeenMessages(u User) *[]Message
+	ValidateAuthorizedUser(u User) bool
+	FindUserByName(n string) (*User, string)
+	MarkMessagesAsRead(u *User)
 }
 
+const (
+	SecretUrl = "https://ar.linkedin.com/in/pedro-parmeggiani-a49b6967"
+)
+
 type DB struct {
-	Collections    []Collection
-	MapCollections []MapCollection
+	UsersCollection []User
 }
 
 type User struct {
 	Name           string
-	Pass           string
-	UnreadMessages []Message
+	Password       string
+	UnseenMessages []Message
 	Messages       []Message
 }
 
 type Message struct {
-	From    string
-	To      string
-	Message string
-}
-
-type Collection struct {
-	Name string
-	Data []string
-}
-
-type MapCollection struct {
-	Name string
-	Data []User
+	From string
+	To   string
+	Body string
 }
 
 func New() *DB {
@@ -45,44 +41,43 @@ func New() *DB {
 func initializer() *DB {
 	var repo = GetRepo()
 
-	var coll = Collection{Name: "Testing"}
-
-	coll.Data = append(coll.Data, repo.TestArray...)
-
-	var collAuth = MapCollection{Name: "Authorized"}
-	collAuth.Data = append(collAuth.Data, repo.Authorized...)
+	var collUsers = []User{}
+	collUsers = append(collUsers, repo.Authorized...)
 
 	var db = DB{}
-	db.Collections = append(db.Collections, coll)
-	db.MapCollections = append(db.MapCollections, collAuth)
+	db.UsersCollection = collUsers
 
 	return &db
 }
 
 func GetAuthorized(d *DB) gin.Accounts {
 	users := make(map[string]string)
-	for _, v := range GetMapCollection(d, "Authorized").Data {
-		users[v.Name] = v.Pass
+	for _, v := range d.UsersCollection {
+		users[v.Name] = v.Password
 	}
 	var auths gin.Accounts = users
 	return auths
 }
 
-// TODO: these are the same! see how to improve, generics would be great
-func GetCollection(d *DB, collName string) *Collection {
-	for _, v := range d.Collections {
-		if v.Name == collName {
-			return &v
+func (d *DB) FindUserByName(name string) (*User, string) {
+	for _, v := range d.UsersCollection {
+		if v.Name == name {
+			return &v, ""
 		}
 	}
-	return nil
+	err := "Couldn't find the user!"
+	return nil, err
 }
 
-func GetMapCollection(d *DB, collName string) *MapCollection {
-	for _, v := range d.MapCollections {
-		if v.Name == collName {
-			return &v
+func (d *DB) MarkMessagesAsRead(u *User) {
+	k := 0
+	for _, v := range d.UsersCollection {
+		if v.Name == u.Name {
+			unread := d.UsersCollection[k].UnseenMessages
+			d.UsersCollection[k].Messages = append(d.UsersCollection[k].Messages, unread...)
+			d.UsersCollection[k].UnseenMessages = nil
+			break
 		}
+		k++
 	}
-	return nil
 }

@@ -18,8 +18,8 @@ func PostAuthUserHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
 		c.Bind(&requestBody)
 
 		user := repo.User{
-			Name: requestBody.Name,
-			Pass: requestBody.Password,
+			Name:     requestBody.Name,
+			Password: requestBody.Password,
 		}
 
 		data.PostAuthUser(user)
@@ -35,13 +35,8 @@ func GetAuthUsersHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
 	}
 }
 
+// TODO: finish this method!
 func SendMessageHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, "authHandlerPlaceHolder")
-	}
-}
-
-func SeenMessagesHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.JSON(http.StatusOK, "authHandlerPlaceHolder")
 	}
@@ -49,6 +44,48 @@ func SeenMessagesHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
 
 func UnseenMessagesHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, "authHandlerPlaceHolder")
+		// if logged in, we can assume the user exists!
+		userName := GetCurrentUser(c)
+
+		if u, err := data.FindUserByName(userName); err != "" {
+			c.JSON(http.StatusInternalServerError, "Couldn't retrieve the user!")
+			return
+		} else {
+			if u.UnseenMessages != nil {
+				c.JSON(http.StatusOK, u.UnseenMessages)
+				data.MarkMessagesAsRead(u)
+				return
+			} else {
+				c.JSON(http.StatusOK, "User has no unseen Messages")
+				return
+			}
+		}
+	}
+}
+
+func SeenMessagesHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// if logged in, we can assume the user exists!
+		userName := GetCurrentUser(c)
+
+		if u, err := data.FindUserByName(userName); err != "" {
+			c.JSON(http.StatusInternalServerError, "Couldn't retrieve the user!")
+			return
+		} else {
+			if u.Messages != nil {
+				c.JSON(http.StatusOK, u.Messages)
+				return
+			} else {
+				c.JSON(http.StatusOK, "User has no Messages")
+				return
+			}
+		}
+	}
+}
+
+func SecretRouteHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Redirect(http.StatusSeeOther, repo.SecretUrl)
+		return
 	}
 }

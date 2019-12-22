@@ -1,34 +1,36 @@
 package api
 
 import (
-	"net/http"
-
+	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+
 	repo "github.com/ginGonicApi/repository"
 )
 
 func SetupRouter(db *repo.DB) *gin.Engine {
 	router := gin.Default()
 
-	v1 := router.Group("/")
-	{
-		v1.POST("/login", LoginHandler())
-	}
+	router.Use(sessions.Sessions("UserSessionCookie", sessions.NewCookieStore([]byte("secret"))))
 
-	authorized := router.Group("/auth", gin.BasicAuth(repo.GetAuthorized(db)))
+	router.POST("/login", LoginHandler(db))
+
+	authorized := router.Group("/auth")
+	authorized.Use(AuthRequired) // here we validate user session
 	{
-		authorized.POST("/newAuthorizedUser", PostAuthUserHandler(db))
-		authorized.GET("/AuthorizedUsers", GetAuthUsersHandler(db))
-		authorized.POST("/sendMessage", SendMessageHandler(db))
+		authorized.GET("/authorizedUsers", GetAuthUsersHandler(db))
 		authorized.GET("/seenMessages", SeenMessagesHandler(db))
 		authorized.GET("/unseenMessages", UnseenMessagesHandler(db))
+		authorized.POST("/newAuthorizedUser", PostAuthUserHandler(db))
+		authorized.POST("/sendMessage", SendMessageHandler(db))
+		authorized.POST("/logout", LogoutHandler())
 	}
 
+	router.GET("/superSecretRoute", SecretRouteHandler())
 	return router
 }
 
-func endpointHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, "handlerPlaceHolder")
-	}
-}
+// func endpointHandler() gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		c.JSON(http.StatusOK, "handlerPlaceHolder")
+// 	}
+// }

@@ -1,18 +1,24 @@
 Small REST API for GoLang + GinGonic testing. 
 
 Intent: 
-- Mock db, with initialization test values. // Testing phase
-- Read a certain collection on the db.
+- Mock db, with initialization test values. // Ok
 - Authorised users group. // Ok
-- Add authorized user. // Ok. But since routes are generated in the beginning, and users live in memory, they aren't added
-- Upload files with auth. 
+- Add authorized user. // Ok
 - Send message to another with auth. 
-- Get unread messages // have to handle login first? how to get user from request
-- Group routes. // Ok
+- Get unread messages // Ok. Marked as read when seen!
+- Group routes with Auth. // Ok
+- Login // Ok
+- PseudoUserSession // Ok
 - Implement tests
 
 
 -----------------
 Improvements:
-- NewAuthorizedUser not being registered on the route for Auth
-- Apply generics or some fix to the GetCollection & GetMapCollection methods on repository, they're the same
+- Add panic handlers when accessing resources
+- Implement hash for passwords
+- Check duplicate users!
+
+
+-----------------
+Design:
+- DB should have a collection of users, which would have their own messages.
