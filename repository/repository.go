@@ -1,16 +1,37 @@
 package repository
 
-type DataReader interface {
-	Read() []string
+import "github.com/gin-gonic/gin"
+
+type IAuthorizedActions interface {
+	PostAuthUser(u User)
+	GetAuthUsers() gin.Accounts
+	SendMessage(to *User, message Message) bool
+	GetUnseenMessages(u *User) []Message
+	GetSeenMessages(u *User) []Message
+	ValidateAuthorizedUser(u User) bool
+	FindUserByName(n string) (*User, string)
+	MarkMessagesAsRead(u *User)
 }
+
+const (
+	SecretUrl = "https://ar.linkedin.com/in/pedro-parmeggiani-a49b6967"
+)
 
 type DB struct {
-	Tables [1]Table
+	UsersCollection []User
 }
 
-type Table struct {
-	Name string
-	Data [3]string
+type User struct {
+	Name           string
+	Password       string
+	UnseenMessages []Message
+	Messages       []Message
+}
+
+type Message struct {
+	From string
+	To   string
+	Body string
 }
 
 func New() *DB {
@@ -18,21 +39,45 @@ func New() *DB {
 }
 
 func initializer() *DB {
-	array := [3]string{"test1", "test2", "test3"}
-	var table = Table{"testing", array}
-	var tables [1]Table
-	tables[0] = table
+	var repo = GetRepo()
 
-	var db = DB{tables}
+	var collUsers = []User{}
+	collUsers = append(collUsers, repo.Authorized...)
+
+	var db = DB{}
+	db.UsersCollection = collUsers
+
 	return &db
 }
 
-func Read() []string {
-	var readTest []string
-	readTest[0] = "Are"
-	readTest[1] = "You"
-	readTest[2] = "Reading"
-	readTest[3] = "This"
+func GetAuthorized(d *DB) gin.Accounts {
+	users := make(map[string]string)
+	for _, v := range d.UsersCollection {
+		users[v.Name] = v.Password
+	}
+	var auths gin.Accounts = users
+	return auths
+}
 
-	return readTest
+func (d *DB) FindUserByName(name string) (*User, string) {
+	for _, v := range d.UsersCollection {
+		if v.Name == name {
+			return &v, ""
+		}
+	}
+	err := "Couldn't find the user!"
+	return nil, err
+}
+
+func (d *DB) MarkMessagesAsRead(u *User) {
+	k := 0
+	for _, v := range d.UsersCollection {
+		if v.Name == u.Name {
+			unread := d.UsersCollection[k].UnseenMessages
+			d.UsersCollection[k].Messages = append(d.UsersCollection[k].Messages, unread...)
+			d.UsersCollection[k].UnseenMessages = nil
+			break
+		}
+		k++
+	}
 }
