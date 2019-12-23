@@ -17,11 +17,13 @@ func (d *DB) GetAuthUsers() gin.Accounts {
 }
 
 func (d *DB) SendMessage(to *User, message Message) bool {
+	i := 0
 	for _, v := range d.UsersCollection {
 		if v.Name == to.Name {
-			v.UnseenMessages = append(v.UnseenMessages, message)
+			d.UsersCollection[i].UnseenMessages = append(d.UsersCollection[0].UnseenMessages, message)
 			return true
 		}
+		i++
 	}
 	return false
 }

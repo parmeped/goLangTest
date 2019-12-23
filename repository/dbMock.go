@@ -3,21 +3,21 @@ package repository
 var authorised = []User{
 	User{"TestUser",
 		"pass",
-		[]Message{Message{"unAuthUser", "TestUser", "Hi, this is an unread Auth Message"}},
-		[]Message{Message{"unAuthUser", "TestUser", "Hi, this was already auth read"}},
+		[]Message{Message{"TestUser2", "TestUser", "Hi, this is an unread Message"}},
+		[]Message{Message{"TestUser2", "TestUser", "Hi, this was already read"}},
 	},
-	User{"unAuthUser",
-		"superPass",
-		[]Message{Message{"TestUser", "unAuthUser", "Hi, this is an unread Message"}},
-		[]Message{Message{"TestUser", "unAuthUser", "Hi, this was already read"}},
+	User{"TestUser2",
+		"pass2",
+		[]Message{Message{"TestUser", "TestUser2", "Hi, this is an unread Message"}},
+		[]Message{Message{"TestUser", "TestUser2", "Hi, this was already read"}},
 	},
 }
 
-var testArray = []string{
-	"test1",
-	"test2",
-	"test3",
-}
+// var testArray = []string{
+// 	"test1",
+// 	"test2",
+// 	"test3",
+// }
 
 // the mocked data returned
 type Repo struct {
@@ -26,6 +26,6 @@ type Repo struct {
 }
 
 func GetRepo() *Repo {
-	repo := Repo{authorised, testArray}
+	repo := Repo{authorised, nil}
 	return &repo
 }

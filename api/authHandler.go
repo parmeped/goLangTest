@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	repo "github.com/ginGonicApi/repository"
@@ -18,11 +19,15 @@ type MessagePostRequest struct {
 	Body string `json:"body"`
 }
 
-// TODO: Check if name or pass are empty. Is this checked somewhere else?
 func PostAuthUserHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestBody := AuthUserPostRequest{}
 		c.Bind(&requestBody)
+
+		if strings.Trim(requestBody.Name, " ") == "" || strings.Trim(requestBody.Password, " ") == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Parameters can't be empty"})
+			return
+		}
 
 		user := repo.User{
 			Name:     requestBody.Name,
@@ -42,21 +47,26 @@ func GetAuthUsersHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
 	}
 }
 
-// TODO: messages are not being added to the unseen ones
 func SendMessageHandler(data repo.IAuthorizedActions) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestBody := MessagePostRequest{}
+		requestBody.From = GetCurrentUser(c)
 		c.Bind(&requestBody)
+
+		if strings.Trim(requestBody.To, " ") == "" || strings.Trim(requestBody.Body, " ") == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Parameters can't be empty"})
+			return
+		}
+
+		if requestBody.From == requestBody.To {
+			c.JSON(http.StatusBadRequest, "Can't send a message to oneself!")
+			return
+		}
 
 		message := repo.Message{
 			From: requestBody.From,
 			To:   requestBody.To,
 			Body: requestBody.Body,
-		}
-
-		if message.From == message.To {
-			c.JSON(http.StatusBadRequest, "Can't send a message to oneself!")
-			return
 		}
 
 		if u, err := data.FindUserByName(message.To); err != "" {

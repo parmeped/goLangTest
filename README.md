@@ -1,16 +1,17 @@
 Small REST API for GoLang + GinGonic testing. 
 
+
+
 Intent: 
 - Mock db, with initialization test values. // Ok
 - Authorised users group. // Ok
 - Add authorized user. // Ok
-- Send message to another with auth. // InProgress
+- Send message to another with auth. // Ok
 - Get unread messages // Ok. Marked as read when seen!
 - Group routes with Auth. // Ok
 - Login // Ok
 - PseudoUserSession // Ok
-- Implement tests
-
+- Implement couple tests // Ok
 
 -----------------
 Improvements:
@@ -18,7 +19,3 @@ Improvements:
 - Implement hash for passwords
 - Check duplicate users!
 
-
------------------
-Design:
-- DB should have a collection of users, which would have their own messages.
